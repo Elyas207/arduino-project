@@ -83,6 +83,8 @@ int signalStrength = 0;
 char MODE = 'N'; // 'R' = FM RADIO | 'B' = BLUETOOTH | 'N' = NONE
 String SettingsOptions[] = {"BT-PASS", ""};
 
+#define BTN_01_PIN = 0
+#define BTN_2_PIN = 0
 void setup() {
   lcd.init();
   lcd.backlight();
@@ -94,19 +96,21 @@ void setup() {
   lcd.setCursor(1,1);
   lcd.print("BT | Radio");
   MuteAll();
-  
 
   
 }
 
 void MuteAll(){
+  // Mute all Audio
   radio.setMonoReception();
   radio.setStereoNoiseCancellingOn();
   radio.mute();
+  bt.switchFunction(bt.eIdle);
+  bt.setVOl(0);
 }
 
 void ShowSettingsMenu() {
-  
+  //Settings Menu
 }
 
 
@@ -136,12 +140,7 @@ void StartBTaudio(){
    lcd.print("BT WIRE CONNECTION");
   }
 
-
-  //while(bt.begin(btSerial)){
-    //if 
-    
-    
-    //}
+  bt.switchFunction(bt.eBluetooth);
 
   
   
