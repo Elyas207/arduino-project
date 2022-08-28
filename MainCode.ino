@@ -49,7 +49,7 @@ byte RIGHT_ARROW[8] = {
   B10000
 };
 
-byte RIGHT_ARROW[8] = {
+byte undif[8] = {
   B10000,
   B11000,
   B11100,
@@ -80,8 +80,8 @@ int frequencyInt = 0;
 float frequency = 0;
 float previousFrequency = 0;
 int signalStrength = 0;
-char MODE = 'R'; // 'R' = FM Radio | 'B' = Bluetooth
-String SettingsOptions[] = {"BT-PASS", ""}
+char MODE = 'N'; // 'R' = FM RADIO | 'B' = BLUETOOTH | 'N' = NONE
+String SettingsOptions[] = {"BT-PASS", ""};
 
 void setup() {
   lcd.init();
@@ -114,6 +114,7 @@ void ShowSettingsMenu() {
 void StartRadio(){
  radio.turnTheSoundBackOn();
  radio.setStandByOff();
+ MODE = 'R';
  
 
   
