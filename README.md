@@ -17,8 +17,10 @@ Parts List:
 > [Ardunio UNO (R3)](https://www.amazon.com.au/Gikfun-Enclosure-Transparent-Computer-Compatible/dp/B00UBT87XM/ref=sr_1_21?crid=21VJV8FZAYMHD&keywords=Arduino+uno&qid=1662103392&s=electronics&sprefix=arduino+un%2Celectronics%2C242&sr=1-21)
 
 > [General Arduino Jumper Wires](https://www.amazon.com.au/120pcs-Multicoloured-Dupont-Breadboard-arduino/dp/B01EV70C78/ref=sr_1_4?crid=KCC4FPIN3SEB&keywords=arduino+jumper+cables&qid=1662103471&s=electronics&sprefix=arduno+jumper+cable%2Celectronics%2C197&sr=1-4)
-##
 
+##
 
 ## Wiring Diagram
 ![Wiring Diagram Image](https://github.com/Elyas207/arduino-project/blob/master/Wiring_Layout_bb.png?raw=true)
+
+> Note: Wiring Diagram currently only contains connections for the TEA5767 Radio Module and does not include connections for the BT401 module yet.
