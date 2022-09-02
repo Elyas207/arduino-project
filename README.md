@@ -36,3 +36,39 @@ Parts List:
 - [ ] Be able to use both speakers using an Audio Mixer
 - [ ] Use available TF Card and U-Disk port provided with the BT401 Evaluation Board
 
+
+
+
+
+# Code Explanation
+
+```C++
+
+int analogPin = 0;
+int val = 0; 
+int frequencyInt = 0;
+float frequency = 0;
+float previousFrequency = 0;
+int signalStrength = 0;
+char MODE = 'N'; // 'R' = FM RADIO | 'B' = BLUETOOTH | 'N' = NONE
+String SettingsOptions[] = {"BT-PASS", ""};
+
+#define BTN_01_PIN = 0
+#define BTN_2_PIN = 0
+void setup() {
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(1,0);
+  lcd.print("BOOTING UP");
+  lcd.clear();
+  lcd.setCursor(0,1);
+  lcd.print("Choose a Mode:");
+  lcd.setCursor(1,1);
+  lcd.print("BT | Radio");
+  MuteAll();
+
+  
+}
+
+```
+
