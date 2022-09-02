@@ -8,7 +8,7 @@ Parts List:
 
 > [1x BT401 V3 Audio & BLE/SPP Pass-through Module - Bluetooth 5.0](https://www.digikey.com.au/en/products/detail/dfrobot/DFR0782/13688341)
 
-> [1x 16x2 LCD Character LCD Display](https://www.amazon.com/SunFounder-Serial-Module-Display-Arduino/dp/B019K5X53O/ref=sr_1_7?keywords=i2c+1602+lcd&qid=1662102357&sr=8-7)
+> [1x 16x2 LCD Character Display](https://www.amazon.com/SunFounder-Serial-Module-Display-Arduino/dp/B019K5X53O/ref=sr_1_7?keywords=i2c+1602+lcd&qid=1662102357&sr=8-7)
 
 > [1x Male to Male TRS Audio Cable](https://www.amazon.com.au/Astrotek-Stereo-3-5mm-Flat-Cable/dp/B07X6RTK3R/ref=sr_1_4?c=ts&keywords=Stereo+Jack+Cables&qid=1662102546&refinements=p_36%3A-400&rnid=5355409051&s=electronics&sr=1-4&ts_id=4885453051)
 
