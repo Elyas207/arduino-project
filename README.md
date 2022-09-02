@@ -32,8 +32,6 @@ Parts List:
 
 >[TEA5767 Arduino Library](https://mathertel.github.io/Radio/html/class_t_e_a5767.html)
 
+## Possible things to change/add
+> Be able to use both speakers using an Audio Mixer
 
-## Task List
-- [ ] Finish Code and test project
-- [x] Start on Readme document
-- [x] Work on custom Fritzing part for BT401 
