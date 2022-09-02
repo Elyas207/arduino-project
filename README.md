@@ -41,4 +41,4 @@ Parts List:
 
 
 # Code
-https://github.com/Elyas207/arduino-project/blob/ac9fbafcdcaa43fd70d281d27a3a29a0a7f5ba64/MainCode.ino
+https://github.com/Elyas207/arduino-project/blob/master/MainCode.ino#L1-L205
