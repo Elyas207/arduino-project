@@ -14,6 +14,10 @@ Parts List:
 
 > [10K Ohm Potentiometer (For controlling selected radio frequency)](https://www.amazon.com.au/Potentiometer-Panel-Mount-Breadboard-Friendly/dp/B07XXWWXMC/ref=sr_1_5?crid=15CC35EPVZNPS&keywords=10k+potentiometer&qid=1662102607&s=electronics&sprefix=10k+petentiom%2Celectronics%2C215&sr=1-5)
 
+> [Ardunio UNO (R3)](https://www.amazon.com.au/Gikfun-Enclosure-Transparent-Computer-Compatible/dp/B00UBT87XM/ref=sr_1_21?crid=21VJV8FZAYMHD&keywords=Arduino+uno&qid=1662103392&s=electronics&sprefix=arduino+un%2Celectronics%2C242&sr=1-21)
+
+> [General Arduino jumper wires](https://www.amazon.com.au/120pcs-Multicoloured-Dupont-Breadboard-arduino/dp/B01EV70C78/ref=sr_1_4?crid=KCC4FPIN3SEB&keywords=arduino+jumper+cables&qid=1662103471&s=electronics&sprefix=arduno+jumper+cable%2Celectronics%2C197&sr=1-4)
+
 
 
 
