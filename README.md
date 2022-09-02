@@ -23,4 +23,4 @@ Parts List:
 ## Wiring Diagram
 ![Wiring Diagram Image](https://github.com/Elyas207/arduino-project/blob/master/Wiring_Layout_bb.png?raw=true)
 
-> Note: Wiring Diagram currently only contains connections for the TEA5767 Radio Module and does not include connections for the BT401 module yet.
+> Note: The wiring diagram currently only includes connections for the TEA5767 Radio Module and no connections for the BT401 module.
