@@ -33,5 +33,6 @@ Parts List:
 >[TEA5767 Arduino Library](https://mathertel.github.io/Radio/html/class_t_e_a5767.html)
 
 ## Possible things to change/add
-> Be able to use both speakers using an Audio Mixer
+- [ ] Be able to use both speakers using an Audio Mixer
+- [ ] Use available TF Card and U-Disk port provided with the BT401 Evaluation Board
 
