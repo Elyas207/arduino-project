@@ -20,4 +20,5 @@ Parts List:
 
 
 
-
+## Wiring Diagram
+![Wiring Diagram Image](https://github.com/Elyas207/arduino-project/blob/master/Wiring_Layout_bb.png?raw=true)
