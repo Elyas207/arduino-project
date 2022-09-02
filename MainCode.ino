@@ -187,7 +187,7 @@ void loop() {
   }
   
     val = val/30;
-    frequencyInt = map(val, 2, 1014, 8700, 10700); //Analog value to frequency from 87.0 MHz to 107.00 MHz 
+    frequencyInt = map(val, 2, 1014, 8700, 10750); //Analog value to frequency from 87.0 MHz to 107.00 MHz 
     float frequency = frequencyInt/100.0f;
 
     if(frequency - previousFrequency >= 0.1f || previousFrequency - frequency >= 0.1f)
