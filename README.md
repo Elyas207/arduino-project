@@ -27,7 +27,7 @@ Parts List:
 
 
 
-## Documentation/Examples for the TEA5767 and BT401 modules
+## Documentation for the TEA5767 and BT401 modules (for your own code exploration).
 >[BT401 by DFROBOT](https://wiki.dfrobot.com/Audio_BLE_SPP_Pass_Through_Module_Bluetooth_5.0_SKU_DFR0781)
 
 >[TEA5767 Arduino Library](https://mathertel.github.io/Radio/html/class_t_e_a5767.html)
