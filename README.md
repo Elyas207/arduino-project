@@ -41,3 +41,7 @@ Parts List:
 
 # Code
 https://github.com/Elyas207/arduino-project/blob/master/MainCode.ino
+
+
+#Additional Sources
+> [ElectronicsClinic](https://www.electroniclinic.com/arduino-fm-radio-using-tea5767-and-rda5807m-fm-stereo-radio-modules/)
