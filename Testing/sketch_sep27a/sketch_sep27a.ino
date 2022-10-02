@@ -28,10 +28,7 @@ float previousFrequency = 0;
 int signalStrength = 0;
 #define BTN_01_PIN = 0
 #define BTN_2_PIN = 0
-String SelectionStage;  //None = None, Startup = Audio source selection, Switch = Switching Source. RemoteConnectWait = Waiting for Remote Control Connection
-String OldStageSelection;
-//createSafeString(SelectionStage, 8);
-//createSafeString(OldStageSelection, 30);
+createSafeString(SelectionStage, 8);  //None = None, Startup = Audio source selection, Switch = Switching Source
 int SelectionStageNum = 0;
 String debug_command;
 String SelectedMode = "None";
@@ -46,27 +43,23 @@ void setup() {
   Wire.begin();
   Serial.begin(9600);
   btSerial.begin(9600);
+  Serial.setTimeout(100);
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print("Starting Up...");
-  Serial.println("PRE-BOOT: OK");
+  //Serial.println("PRE-BOOT: OK");
   SelectionStage = "";
   delay(2000);
-  //command("AT+CM08\r\n");
+  command("AT+CM08\r\n");
   BluetoothAlreadyStarted = true;
   MuteAll();
   radio.selectFrequency(frequency);
   radio.setStereoNoiseCancellingOn();
   SelectionStageNum = 0;
   SelectionStage = "Startup";
-  Serial.print("Startup OK.");
-  SelectionStage = String("RemoteConnectWait");
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Waiting for");
-  lcd.setCursor(0, 1);
-  lcd.print("Remote Connection");
+  //Serial.print("Startup OK.");
+  SelectionStage = "Startup";
 }
 
 
@@ -166,80 +159,11 @@ void loop() {
     }
   }
 
-
-
-  if (btSerial.available()) {
-    debug_command = btSerial.readStringUntil('\n');
+  if (Serial.available()) {
+    debug_command = Serial.readStringUntil('\n');
     Serial.println(debug_command);
-
-    if (debug_command.equals("REMOTE_COMMAND=HOME")) {
-      if (SelectionStage == "None") {
-        MuteAll();
-        lcd.clear();
-        SelectionStageNum = 0;
-        SelectionStage = "Startup";
-      }
-    }
-
-    if (debug_command.equals("REMOTE_COMMAND=CONNECTED")) {
-      lcd.clear();
-      lcd.setCursor(0, 1);
-      lcd.print("Connected to the");
-      lcd.setCursor(0, 2);
-      lcd.print("Control Website!");
-      delay(1500);
-      lcd.clear();
-      if (SelectionStage.equals("RemoteConnectWait")) {
-        if (SelectedMode == "Radio" || SelectedMode == "Bluetooth") {
-          if (SelectedMode == "Radio") {
-            SelectionStage = "None";
-            UpdateRadioInfo();
-          }
-
-          if (SelectedMode == "Bluetooth") {
-            SelectionStage = "None";
-            UpdateBluetoothInfo();
-          }
-
-        }
-
-        else {
-          SelectionStage = "Startup";
-        }
-      }
-    }
-
-
-    if (debug_command.equals("REMOTE_COMMAND=DISCONNECTED") || debug_command.equals("TS+04")) {
-      OldStageSelection = SelectionStage;
-      SelectionStage = "RemoteConnectWait";
-      lcd.clear();
-      lcd.setCursor(0, 1);
-      lcd.print("Disconnected from");
-      lcd.setCursor(0, 2);
-      lcd.print("the Control Website");
-      delay(1500);
-      lcd.clear();
-      SelectionStage = OldStageSelection;
-      if (SelectionStage.equals("Startup") || OldStageSelection.equals("Startup") || SelectionStage.equals("None") || OldStageSelection.equals("None")) {
-        SelectionStage = "RemoteConnectWait";
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Waiting for");
-        lcd.setCursor(0, 1);
-        lcd.print("Remote Connection");
-      }
-    }
-
-
-
-    if (debug_command.equals("REMOTE_COMMAND=UP")) {
-      Serial.println(SelectionStage);
-      Serial.println("Debug Command is: Up");
+    if (debug_command.equals("up")) {
       if (SelectionStage == "Startup") {
-
-        Serial.println(SelectionStage);
-
         if (SelectionStageNum == 0) {
           SelectionStageNum = 1;
           lcd.clear();
@@ -249,9 +173,7 @@ void loop() {
       }
     }
 
-
-    if (debug_command.equals("REMOTE_COMMAND=DOWN")) {
-      Serial.println("Remote Command is: Down");
+    if (debug_command.equals("down")) {
       if (SelectionStage == "Startup") {
         if (SelectionStageNum == 1) {
           lcd.clear();
@@ -263,9 +185,7 @@ void loop() {
     }
 
 
-
-    if (debug_command.equals("REMOTE_COMMAND=SELECT")) {
-      Serial.println("Remote Command is: Select");
+    if (debug_command.equals("select")) {
       if (SelectionStage == "Startup") {
         if (SelectionStageNum == 0) {
 
@@ -287,8 +207,24 @@ void loop() {
         }
       }
     }
+
+
+
+    if (debug_command.equals("switch_bluetooth")) {
+      MuteAll();
+      Serial.print("Switching Over to Bluetooth Audio");
+      SwitchAudioSource("Bluetooth");
+    }
+
+
+    if (debug_command.equals("switch_radio")) {
+      MuteAll();
+      Serial.print("Switching Over to FM Radio");
+      SwitchAudioSource("Radio");
+    }
   }
 }
+
 
 void SwitchAudioSource(String toSwitch) {
   if (toSwitch == "Bluetooth") {
@@ -327,83 +263,8 @@ void SwitchAudioSource(String toSwitch) {
 
 
 String command(const char *toSend) {
-  String result;
-  Serial.print("Sending: ");
-  Serial.println(toSend);
+  //String result;
+  //Serial.print("Sending: ");
+  //Serial.println(toSend);
   btSerial.println(toSend);
 }
-
-
-
-// if (Serial.available()) {
-//    debug_command = Serial.readStringUntil('\n');
-//    Serial.println(debug_command);
-//    if (debug_command.equals("up")) {
-//
-//      Serial.println(SelectionStage);
-//      Serial.println("Debug Command is: Up");
-//      if (SelectionStage == "Startup") {
-//
-//        Serial.println(SelectionStage);
-//
-//        if (SelectionStageNum == 0) {
-//          SelectionStageNum = 1;
-//          lcd.clear();
-//          lcd.setCursor(0, 0);
-//          lcd.print("Choose a mode:");
-//        }
-//      }
-//    }
-//
-//    if (debug_command.equals("down")) {
-//      Serial.println("Debug Command is: Down");
-//      if (SelectionStage == "Startup") {
-//        if (SelectionStageNum == 1) {
-//          lcd.clear();
-//          lcd.setCursor(0, 0);
-//          lcd.print("Choose a mode:");
-//          SelectionStageNum = 0;
-//        }
-//      }
-//    }
-//
-//
-//    if (debug_command.equals("select")) {
-//      Serial.println("Debug Command is: Select");
-//      if (SelectionStage == "Startup") {
-//        if (SelectionStageNum == 0) {
-//
-//          SelectedMode = "Radio";
-//          SelectionStage = "None";
-//          BluetoothAudioPortOpened = "No";
-//          RadioAudioPortOpened = "Yes";
-//          MODE = 'R';
-//          StartRadio();
-//        }
-//
-//        if (SelectionStageNum == 1) {
-//          SelectedMode = "Bluetooth";
-//          SelectionStage = "None";
-//          RadioAudioPortOpened = "No";
-//          BluetoothAudioPortOpened = "Yes";
-//          MODE = 'B';
-//          StartBluetooth();
-//        }
-//      }
-//    }
-//
-//
-//
-//    if (debug_command.equals("switch_bluetooth")) {
-//      MuteAll();
-//      Serial.print("Switching Over to Bluetooth Audio");
-//      SwitchAudioSource("Bluetooth");
-//    }
-//
-//
-//    if (debug_command.equals("switch_radio")) {
-//      MuteAll();
-//      Serial.print("Switching Over to FM Radio");
-//      SwitchAudioSource("Radio");
-//    }
-//  }
