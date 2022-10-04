@@ -194,17 +194,20 @@ void loop() {
           if (SelectedMode == "Radio") {
             SelectionStage = "None";
             UpdateRadioInfo();
+            btSerial.write("MODE_SET=RADIO");
           }
 
           if (SelectedMode == "Bluetooth") {
             SelectionStage = "None";
             UpdateBluetoothInfo();
+            btSerial.write("MODE_SET=BT");
           }
 
         }
 
         else {
           SelectionStage = "Startup";
+          btSerial.write("STARTUP=TRUE");
         }
       }
     }
@@ -268,13 +271,14 @@ void loop() {
       Serial.println("Remote Command is: Select");
       if (SelectionStage == "Startup") {
         if (SelectionStageNum == 0) {
-
+            
           SelectedMode = "Radio";
           SelectionStage = "None";
           BluetoothAudioPortOpened = "No";
           RadioAudioPortOpened = "Yes";
           MODE = 'R';
           StartRadio();
+          btSerial.write("MODE_SET=RADIO");
         }
 
         if (SelectionStageNum == 1) {
@@ -284,6 +288,7 @@ void loop() {
           BluetoothAudioPortOpened = "Yes";
           MODE = 'B';
           StartBluetooth();
+          btSerial.write("MODE_SET=BT");
         }
       }
     }
