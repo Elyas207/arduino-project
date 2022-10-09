@@ -39,6 +39,10 @@ String BluetoothAudioPortOpened = "No";
 String RadioAudioPortOpened = "No";
 bool BluetoothAlreadyStarted = false;
 String BluetoothStatus = " ";
+String IncomingFreqChangeStr = "";
+int SignalStrength = 10;
+unsigned long previousMillis_1 = 0;
+const long Interval_1 = 2500;
 SoftwareSerial btSerial(2, 3);  //RX TX
 
 
@@ -52,8 +56,6 @@ void setup() {
   lcd.print("Starting Up...");
   Serial.println("PRE-BOOT: OK");
   SelectionStage = "";
-  delay(2000);
-  //command("AT+CM08\r\n");
   BluetoothAlreadyStarted = true;
   MuteAll();
   radio.selectFrequency(frequency);
@@ -61,7 +63,8 @@ void setup() {
   SelectionStageNum = 0;
   SelectionStage = "Startup";
   Serial.print("Startup OK.");
-  SelectionStage = String("RemoteConnectWait");
+  delay(500);
+  SelectionStage = "RemoteConnectWait";
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Waiting for");
@@ -78,8 +81,14 @@ void UpdateRadioInfo() {
     lcd.setCursor(0, 0);
     lcd.print("RADIO:");
     lcd.setCursor(0, 1);
-    String frequencyString = String(frequency);
-    lcd.print(frequencyString);
+    lcd.print(String(frequency));
+    SignalStrength = radio.getSignalLevel() * 10;
+    lcd.setCursor(0, 3);
+    if (SignalStrength > 100) {
+      SignalStrength = 100;
+    }
+
+    lcd.print("Strength: " + String(SignalStrength) + "%");
   }
 }
 
@@ -103,14 +112,12 @@ void StartRadio() {
   radio.turnTheSoundBackOn();
   radio.selectFrequency(frequency);
   MODE = 'R';
-
   UpdateRadioInfo();
 }
 
 
 void StartBluetooth() {
   if (BluetoothAlreadyStarted == false) {
-    command("AT+CM01");
   }
 
   MODE = 'B';
@@ -128,6 +135,16 @@ void MuteAll() {
 }
 
 void loop() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis_1 >= Interval_1) {
+    if (SelectionStage == "None") {
+      if (SelectedMode == "Radio") {
+        UpdateRadioInfo();
+      }
+    }
+    previousMillis_1 = currentMillis;
+  }
+
   if (SelectionStage == "Startup") {
     lcd.setCursor(0, 0);
     lcd.print("Choose a mode:");
@@ -187,7 +204,7 @@ void loop() {
       lcd.print("Connected to the");
       lcd.setCursor(0, 2);
       lcd.print("Control Website!");
-      delay(1500);
+      delay(2000);
       lcd.clear();
       if (SelectionStage.equals("RemoteConnectWait")) {
         if (SelectedMode == "Radio" || SelectedMode == "Bluetooth") {
@@ -271,7 +288,7 @@ void loop() {
       Serial.println("Remote Command is: Select");
       if (SelectionStage == "Startup") {
         if (SelectionStageNum == 0) {
-            
+
           SelectedMode = "Radio";
           SelectionStage = "None";
           BluetoothAudioPortOpened = "No";
@@ -290,6 +307,22 @@ void loop() {
           StartBluetooth();
           btSerial.write("MODE_SET=BT");
         }
+      }
+    }
+
+
+    if (debug_command.startsWith("SET_RADIO_FREQ=")) {
+      Serial.println("Debug Command starts with SET_RADIO_FREQ=");
+      if (SelectionStage == "None" && SelectedMode == "Radio") {
+        int index = debug_command.indexOf('=');
+        index = index + 1;
+        int length = debug_command.length();
+        IncomingFreqChangeStr = debug_command.substring(index, length);
+        Serial.println(IncomingFreqChangeStr);
+
+        frequency = IncomingFreqChangeStr.toFloat();
+        radio.selectFrequency(frequency);
+        UpdateRadioInfo();
       }
     }
   }
@@ -333,8 +366,6 @@ void SwitchAudioSource(String toSwitch) {
 
 String command(const char *toSend) {
   String result;
-  Serial.print("Sending: ");
-  Serial.println(toSend);
   btSerial.println(toSend);
 }
 
