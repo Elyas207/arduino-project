@@ -1,3 +1,5 @@
+
+
 #include <BufferedInput.h>
 #include <BufferedOutput.h>
 #include <loopTimer.h>
@@ -15,6 +17,7 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <SoftwareSerial.h>
+
 
 TEA5767N radio = TEA5767N();
 LiquidCrystal_I2C lcd(0x27, 20, 4);
@@ -43,12 +46,14 @@ String IncomingFreqChangeStr = "";
 int SignalStrength = 10;
 unsigned long previousMillis_1 = 0;
 const long Interval_1 = 2500;
-SoftwareSerial btSerial(2, 3);  //RX TX
+SoftwareSerial btSerial(2, 3);           //RX TX (BT401 Module)
+SoftwareSerial btCommandSerial(10, 11);  //RX TX (HM-10 Module)
 
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
+  btCommandSerial.begin(9600);
   btSerial.begin(9600);
   lcd.init();
   lcd.backlight();
@@ -63,7 +68,7 @@ void setup() {
   SelectionStageNum = 0;
   SelectionStage = "Startup";
   Serial.print("Startup OK.");
-  delay(500);
+  delay(1300);
   SelectionStage = "RemoteConnectWait";
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -117,9 +122,7 @@ void StartRadio() {
 
 
 void StartBluetooth() {
-  if (BluetoothAlreadyStarted == false) {
-  }
-
+  command("AT+CM01\r\n");
   MODE = 'B';
   UpdateBluetoothInfo();
 }
@@ -132,6 +135,7 @@ void MuteAll() {
   // Mute all Audio
   radio.setStereoNoiseCancellingOn();
   radio.mute();
+  command("AT+CM08\r\n");
 }
 
 void loop() {
@@ -185,9 +189,9 @@ void loop() {
 
 
 
-  if (btSerial.available()) {
-    debug_command = btSerial.readStringUntil('\n');
-    Serial.println(debug_command);
+  if (btCommandSerial.available()) {
+    debug_command = btCommandSerial.read();
+    Serial.print(debug_command);
 
     if (debug_command.equals("REMOTE_COMMAND=HOME")) {
       if (SelectionStage == "None") {
@@ -366,7 +370,7 @@ void SwitchAudioSource(String toSwitch) {
 
 String command(const char *toSend) {
   String result;
-  btSerial.println(toSend);
+  btSerial.write(toSend);
 }
 
 
