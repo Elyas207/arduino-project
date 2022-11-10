@@ -1,5 +1,4 @@
-
-
+#include <AltSoftSerial.h>
 #include <BufferedInput.h>
 #include <BufferedOutput.h>
 #include <loopTimer.h>
@@ -18,7 +17,6 @@
 #include <LiquidCrystal_I2C.h>
 #include <SoftwareSerial.h>
 
-
 TEA5767N radio = TEA5767N();
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
@@ -36,7 +34,7 @@ String OldStageSelection;
 //createSafeString(SelectionStage, 8);
 //createSafeString(OldStageSelection, 30);
 int SelectionStageNum = 0;
-String debug_command;
+String BLEcommand;
 String SelectedMode = "None";
 String BluetoothAudioPortOpened = "No";
 String RadioAudioPortOpened = "No";
@@ -46,20 +44,20 @@ String IncomingFreqChangeStr = "";
 int SignalStrength = 10;
 unsigned long previousMillis_1 = 0;
 const long Interval_1 = 2500;
-SoftwareSerial btSerial(2, 3);           //RX TX (BT401 Module)
-SoftwareSerial btCommandSerial(10, 11);  //RX TX (HM-10 Module)
+SoftwareSerial btSerial(2, 3);  //RX TX (BT401 Module)
+//HM-10 is using Hardware Serial
+SoftwareSerial btCommandSerial(10, 11);
 
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
-  btCommandSerial.begin(9600);
   btSerial.begin(9600);
+  btCommandSerial.begin(9600);
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print("Starting Up...");
-  Serial.println("PRE-BOOT: OK");
   SelectionStage = "";
   BluetoothAlreadyStarted = true;
   MuteAll();
@@ -67,7 +65,6 @@ void setup() {
   radio.setStereoNoiseCancellingOn();
   SelectionStageNum = 0;
   SelectionStage = "Startup";
-  Serial.print("Startup OK.");
   delay(1300);
   SelectionStage = "RemoteConnectWait";
   lcd.clear();
@@ -81,19 +78,12 @@ void setup() {
 
 void UpdateRadioInfo() {
 
-  if (MODE == 'R') {
+  if (SelectedMode == "Radio") {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("RADIO:");
     lcd.setCursor(0, 1);
     lcd.print(String(frequency));
-    SignalStrength = radio.getSignalLevel() * 10;
-    lcd.setCursor(0, 3);
-    if (SignalStrength > 100) {
-      SignalStrength = 100;
-    }
-
-    lcd.print("Strength: " + String(SignalStrength) + "%");
   }
 }
 
@@ -116,7 +106,7 @@ void CheckBTStatus() {
 void StartRadio() {
   radio.turnTheSoundBackOn();
   radio.selectFrequency(frequency);
-  MODE = 'R';
+  SelectedMode = "Radio";
   UpdateRadioInfo();
 }
 
@@ -139,15 +129,7 @@ void MuteAll() {
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis_1 >= Interval_1) {
-    if (SelectionStage == "None") {
-      if (SelectedMode == "Radio") {
-        UpdateRadioInfo();
-      }
-    }
-    previousMillis_1 = currentMillis;
-  }
+
 
   if (SelectionStage == "Startup") {
     lcd.setCursor(0, 0);
@@ -188,21 +170,21 @@ void loop() {
   }
 
 
-
+  btCommandSerial.listen();
   if (btCommandSerial.available()) {
-    debug_command = btCommandSerial.read();
-    Serial.print(debug_command);
-
-    if (debug_command.equals("REMOTE_COMMAND=HOME")) {
+    BLEcommand = btCommandSerial.readStringUntil('\n');
+    Serial.println(BLEcommand);
+    if (BLEcommand.equals("REMOTE_COMMAND=HOME")) {
       if (SelectionStage == "None") {
         MuteAll();
         lcd.clear();
         SelectionStageNum = 0;
         SelectionStage = "Startup";
+        commandSerial("STARTUP=TRUE");
       }
     }
 
-    if (debug_command.equals("REMOTE_COMMAND=CONNECTED")) {
+    if (BLEcommand.equals("REMOTE_COMMAND=CONNECTED")) {
       lcd.clear();
       lcd.setCursor(0, 1);
       lcd.print("Connected to the");
@@ -215,26 +197,26 @@ void loop() {
           if (SelectedMode == "Radio") {
             SelectionStage = "None";
             UpdateRadioInfo();
-            btSerial.write("MODE_SET=RADIO");
+            commandSerial("MODE_SET=RADIO");
           }
 
           if (SelectedMode == "Bluetooth") {
             SelectionStage = "None";
             UpdateBluetoothInfo();
-            btSerial.write("MODE_SET=BT");
+            commandSerial("MODE_SET=BT");
           }
 
         }
 
         else {
           SelectionStage = "Startup";
-          btSerial.write("STARTUP=TRUE");
+          commandSerial("STARTUP=TRUE");
         }
       }
     }
 
 
-    if (debug_command.equals("REMOTE_COMMAND=DISCONNECTED") || debug_command.equals("TS+04")) {
+    if (BLEcommand.equals("REMOTE_COMMAND=DISCONNECTED") || BLEcommand.equals("TS+04")) {
       OldStageSelection = SelectionStage;
       SelectionStage = "RemoteConnectWait";
       lcd.clear();
@@ -257,12 +239,8 @@ void loop() {
 
 
 
-    if (debug_command.equals("REMOTE_COMMAND=UP")) {
-      Serial.println(SelectionStage);
-      Serial.println("Debug Command is: Up");
+    if (BLEcommand.equals("REMOTE_COMMAND=UP")) {
       if (SelectionStage == "Startup") {
-
-        Serial.println(SelectionStage);
 
         if (SelectionStageNum == 0) {
           SelectionStageNum = 1;
@@ -274,8 +252,7 @@ void loop() {
     }
 
 
-    if (debug_command.equals("REMOTE_COMMAND=DOWN")) {
-      Serial.println("Remote Command is: Down");
+    if (BLEcommand.equals("REMOTE_COMMAND=DOWN")) {
       if (SelectionStage == "Startup") {
         if (SelectionStageNum == 1) {
           lcd.clear();
@@ -288,8 +265,7 @@ void loop() {
 
 
 
-    if (debug_command.equals("REMOTE_COMMAND=SELECT")) {
-      Serial.println("Remote Command is: Select");
+    if (BLEcommand.equals("REMOTE_COMMAND=SELECT")) {
       if (SelectionStage == "Startup") {
         if (SelectionStageNum == 0) {
 
@@ -299,7 +275,7 @@ void loop() {
           RadioAudioPortOpened = "Yes";
           MODE = 'R';
           StartRadio();
-          btSerial.write("MODE_SET=RADIO");
+          commandSerial("MODE_SET=RADIO");
         }
 
         if (SelectionStageNum == 1) {
@@ -309,21 +285,18 @@ void loop() {
           BluetoothAudioPortOpened = "Yes";
           MODE = 'B';
           StartBluetooth();
-          btSerial.write("MODE_SET=BT");
+          commandSerial("MODE_SET=BT");
         }
       }
     }
 
 
-    if (debug_command.startsWith("SET_RADIO_FREQ=")) {
-      Serial.println("Debug Command starts with SET_RADIO_FREQ=");
+    if (BLEcommand.startsWith("F=")) {
       if (SelectionStage == "None" && SelectedMode == "Radio") {
-        int index = debug_command.indexOf('=');
+        int index = BLEcommand.indexOf('=');
         index = index + 1;
-        int length = debug_command.length();
-        IncomingFreqChangeStr = debug_command.substring(index, length);
-        Serial.println(IncomingFreqChangeStr);
-
+        int length = BLEcommand.length();
+        IncomingFreqChangeStr = BLEcommand.substring(index, length);
         frequency = IncomingFreqChangeStr.toFloat();
         radio.selectFrequency(frequency);
         UpdateRadioInfo();
@@ -337,7 +310,6 @@ void SwitchAudioSource(String toSwitch) {
 
     if (MODE == 'R') {
       MuteAll();
-      Serial.print("Switch Function active... Posting to BT Audio Module");
       SelectionStage = "Switching";
       lcd.clear();
       lcd.setCursor(0, 0);
@@ -352,7 +324,6 @@ void SwitchAudioSource(String toSwitch) {
   if (toSwitch == "Radio") {
     if (MODE == 'B') {
       MuteAll();
-      Serial.print("Switch Function active... Posting to FM Radio Module");
       SelectionStage = "Switching";
       lcd.clear();
       lcd.setCursor(0, 0);
@@ -368,11 +339,13 @@ void SwitchAudioSource(String toSwitch) {
 
 
 
-String command(const char *toSend) {
-  String result;
-  btSerial.write(toSend);
+String command(String toSend) {
+  btSerial.print(toSend);
 }
 
+String commandSerial(String toSend) {
+  btCommandSerial.print(toSend);
+}
 
 
 // if (Serial.available()) {
